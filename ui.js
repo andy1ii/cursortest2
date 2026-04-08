@@ -1,4 +1,4 @@
-// --- ui.js : Handles global interface, variables, and exporting ---
+// --- ui.js : Handles global interface, variables, scaling and exporting ---
 
 window.currentMode = 'cube'; 
 let exportScaleVal = 1;
@@ -16,176 +16,86 @@ const dummyPresetFn = (v) => { /* Ignored for now */ };
 const toolbarConfigs = {
   cube: {
     dyn1: {
-      type: 'select',
-      label: "Circle Size",
-      items: [{ label: 'Small', value: 10 }, { label: 'Medium', value: 20 }, { label: 'Large', value: 40 }],
-      val: 10,
+      type: 'select', label: "Circle Size", items: [{ label: 'Small', value: 10 }, { label: 'Medium', value: 20 }, { label: 'Large', value: 40 }], val: 10,
       onChange: (v) => { try{ cubeGridSpacing = parseFloat(v); }catch(e){} }
     },
     dyn2: {
-      type: 'slider', 
-      label: "Density",
-      min: 0.6,
-      max: 1.4,
-      step: 0.1,
-      val: 1.4, 
+      type: 'slider', label: "Density", min: 0.6, max: 1.4, step: 0.1, val: 1.4, 
       onChange: (v) => { try{ densityBoost = parseFloat(v); }catch(e){} }
     },
     dyn3: {
-      type: 'slider', 
-      label: "Fluidity Fade",
-      min: 0.0,
-      max: 1.0,
-      step: 0.05,
-      val: 0.0, 
+      type: 'slider', label: "Fluidity Fade", min: 0.0, max: 1.0, step: 0.05, val: 0.0, 
       onChange: (v) => { try{ cubeFluidityFade = parseFloat(v); }catch(e){} }
     },
     dynPreset: { 
-      type: 'select', 
-      label: "Preset", 
-      items: [
-        { label: 'Style 1', value: 'Style 1' },
-        { label: 'Style 2', value: 'Style 2' },
-        { label: 'Style 3', value: 'Style 3' }
-      ], 
-      val: 'Style 1', 
-      onChange: (v) => { 
-        window.currentCubeStyle = v; 
-        triggerCanvasUpdate(); 
-      } 
+      type: 'select', label: "Preset", items: dummyPresets, val: 'Style 1', 
+      onChange: (v) => { window.currentCubeStyle = v; triggerCanvasUpdate(); } 
     }
   },
   mesh: {
-    dyn1: {
-      type: 'select',
-      label: "Grid Resolution",
-      items: [{ label: 'Fine', value: 15 }, { label: 'Standard', value: 30 }, { label: 'Coarse', value: 60 }],
-      val: 15,
-      onChange: (v) => { try{ meshGridSize = parseFloat(v); }catch(e){} }
-    },
-    dyn2: {
-      type: 'slider', 
-      label: "Fluidity Fade",
-      min: 0.0,
-      max: 1.0,
-      step: 0.05,
-      val: 0.0, 
-      onChange: (v) => { try{ meshFluidityFade = parseFloat(v); }catch(e){} }
-    },
+    dyn1: { type: 'select', label: "Grid Resolution", items: [{ label: 'Fine', value: 15 }, { label: 'Standard', value: 30 }, { label: 'Coarse', value: 60 }], val: 15, onChange: (v) => { try{ meshGridSize = parseFloat(v); }catch(e){} } },
+    dyn2: { type: 'slider', label: "Fluidity Fade", min: 0.0, max: 1.0, step: 0.05, val: 0.0, onChange: (v) => { try{ meshFluidityFade = parseFloat(v); }catch(e){} } },
     dyn3: null,
     dynPreset: { type: 'select', label: "Preset", items: dummyPresets, val: 'Style 1', onChange: dummyPresetFn }
   },
   shader: {
-    dyn1: {
-      type: 'slider',
-      label: "Zoom",
-      min: 0.2, 
-      max: 2.5, 
-      step: 0.1,
-      val: 1.0,
-      onChange: (v) => { 
-          try { window.shaderZoom = parseFloat(v); } catch(e){} 
-          if (typeof draw === 'function') draw(); 
-      }
-    },
-    dyn2: {
-      type: 'slider',
-      label: "Extrusion Depth",
-      min: 0.1,
-      max: 2.0,
-      step: 0.1,
-      val: 1.0,
-      onChange: (v) => { 
-          try { 
-              shaderExtrusion = parseFloat(v); 
-              if (typeof shaderBlocks !== 'undefined') shaderBlocks.length = 0; 
-              _lastShaderWidth = 0; 
-              _shaderBuildPending = true;
-          } catch(e){} 
-      }
-    },
-    dyn3: {
-      type: 'slider',
-      label: "Fluidity Fade",
-      min: 0.0, 
-      max: 1.0, 
-      step: 0.05,
-      val: 0.0, 
-      onChange: (v) => { 
-          try { 
-              shaderFluidityFade = parseFloat(v); 
-              if (typeof shaderBlocks !== 'undefined') shaderBlocks.length = 0; 
-              _lastShaderWidth = 0; 
-              _shaderBuildPending = true;
-          } catch(e){} 
-      }
-    },
+    dyn1: { type: 'slider', label: "Zoom", min: 0.2, max: 2.5, step: 0.1, val: 1.0, onChange: (v) => { try { window.shaderZoom = parseFloat(v); } catch(e){} if (typeof draw === 'function') draw(); } },
+    dyn2: { type: 'slider', label: "Extrusion Depth", min: 0.1, max: 2.0, step: 0.1, val: 1.0, onChange: (v) => { try { shaderExtrusion = parseFloat(v); if (typeof shaderBlocks !== 'undefined') shaderBlocks.length = 0; _lastShaderWidth = 0; _shaderBuildPending = true; } catch(e){} } },
+    dyn3: { type: 'slider', label: "Fluidity Fade", min: 0.0, max: 1.0, step: 0.05, val: 0.0, onChange: (v) => { try { shaderFluidityFade = parseFloat(v); if (typeof shaderBlocks !== 'undefined') shaderBlocks.length = 0; _lastShaderWidth = 0; _shaderBuildPending = true; } catch(e){} } },
     dynPreset: { type: 'select', label: "Preset", items: dummyPresets, val: 'Style 1', onChange: dummyPresetFn }
   },
   flow: {
-    dyn1: {
-      type: 'select',
-      label: "Hatch Precision",
-      items: [{ label: 'Fine', value: 0.001 }, { label: 'Medium', value: 0.0022 }, { label: 'Coarse', value: 0.005 }],
-      val: 0.001,
-      onChange: (v) => { try{ flowCurveScale = parseFloat(v); compilePlotterTopology(); }catch(e){} }
-    },
-    dyn2: {
-      type: 'slider',
-      label: "Line Thickness",
-      min: 0.5,
-      max: 3.0,
-      step: 0.1,
-      val: 1.2,
-      onChange: (v) => { try{ flowLineWeight = parseFloat(v); compilePlotterTopology(); }catch(e){} }
-    },
-    dyn3: {
-      type: 'slider', 
-      label: "Fluidity Fade",
-      min: 0.0,
-      max: 1.0,
-      step: 0.05,
-      val: 0.0, 
-      onChange: (v) => { try{ flowFluidityFade = parseFloat(v); compilePlotterTopology(); }catch(e){} }
-    },
+    dyn1: { type: 'select', label: "Hatch Precision", items: [{ label: 'Fine', value: 0.001 }, { label: 'Medium', value: 0.0022 }, { label: 'Coarse', value: 0.005 }], val: 0.001, onChange: (v) => { try{ flowCurveScale = parseFloat(v); compilePlotterTopology(); }catch(e){} } },
+    dyn2: { type: 'slider', label: "Line Thickness", min: 0.5, max: 3.0, step: 0.1, val: 1.2, onChange: (v) => { try{ flowLineWeight = parseFloat(v); compilePlotterTopology(); }catch(e){} } },
+    dyn3: { type: 'slider', label: "Fluidity Fade", min: 0.0, max: 1.0, step: 0.05, val: 0.0, onChange: (v) => { try{ flowFluidityFade = parseFloat(v); compilePlotterTopology(); }catch(e){} } },
     dynPreset: { type: 'select', label: "Preset", items: dummyPresets, val: 'Style 1', onChange: dummyPresetFn }
   }
 };
 
+window.fitToolbarToScreen = function() {
+  const container = document.getElementById('ui-container');
+  if (!container) return;
+
+  // Reset to measure true unscaled height
+  container.style.transform = 'none';
+  void container.offsetHeight; // force layout
+  
+  const naturalHeight = container.scrollHeight;
+  const topGap = 20; 
+  const bottomGap = window.innerHeight / 8; // 1/8th viewport gap guarantee
+  const availableHeight = window.innerHeight - topGap - bottomGap;
+
+  // Shrinks base UI to 85% by default
+  let scale = 0.85;
+
+  // Mathematically shrink further if it STILL exceeds viewport real estate
+  if (naturalHeight * scale > availableHeight) {
+    scale = availableHeight / naturalHeight;
+  }
+
+  container.style.transform = `scale(${scale})`;
+};
+
 function triggerCanvasUpdate() {
   if (typeof constrain !== 'function') return; 
-
   if (typeof clear === 'function') clear();
   if (window.currentMode === 'cube' && typeof generateQuadtreePattern === 'function') generateQuadtreePattern();
   if (window.currentMode === 'flow' && typeof compilePlotterTopology === 'function') compilePlotterTopology();
-  
-  if (window.currentMode === 'mesh') { 
-    try { 
-      if (typeof setupMesh === 'function') setupMesh(); 
-      if (typeof processMeshMask === 'function') processMeshMask(); 
-    } catch(e){} 
-  }
+  if (window.currentMode === 'mesh') { try { if (typeof setupMesh === 'function') setupMesh(); if (typeof processMeshMask === 'function') processMeshMask(); } catch(e){} }
 }
 
 function getBrandPalette() {
-  if (typeof window.getBrandPaletteHexCatalog === 'function') {
-      return window.getBrandPaletteHexCatalog();
-  }
-  
+  if (typeof window.getBrandPaletteHexCatalog === 'function') { return window.getBrandPaletteHexCatalog(); }
   let colors = [];
   for (let key in window) {
     if (key.startsWith('BRAND_') && typeof window[key] === 'object') {
       for (let cKey in window[key]) {
         let val = window[key][cKey];
-        if (typeof val === 'string' && val.match(/^#([0-9A-F]{3}){1,2}$/i)) {
-          colors.push(val.toUpperCase());
-        }
+        if (typeof val === 'string' && val.match(/^#([0-9A-F]{3}){1,2}$/i)) { colors.push(val.toUpperCase()); }
       }
     }
   }
-  if (colors.length === 0) {
-    colors = ['#1C1C1C', '#3D3D3D', '#FF8000', '#8B5C44', '#2D69E6', '#C2CB7F', '#7DBA97', '#284A3A', '#F4F2EB', '#DCDFE3', '#5C5A55'];
-  }
+  if (colors.length === 0) { colors = ['#1C1C1C', '#3D3D3D', '#FF8000', '#8B5C44', '#2D69E6', '#C2CB7F', '#7DBA97', '#284A3A', '#F4F2EB', '#DCDFE3', '#5C5A55']; }
   return [...new Set(colors)]; 
 }
 
@@ -214,23 +124,15 @@ window.updateGlobalColor = function(type, index, hex) {
             if (type === 'fg' && index === 0) { try { flowColor1 = hex; } catch(e){} }
         } else if (mode === 'mesh') {
             if (type === 'bg') { try { meshBgColor = hex; } catch(e){} }
-            if (type === 'fg') {
-                try { window.artColors = window.artColors || []; window.artColors[index] = hex; } catch(e){}
-            }
+            if (type === 'fg') { try { window.artColors = window.artColors || []; window.artColors[index] = hex; } catch(e){} }
         }
     } catch(e) {}
 
     const labelSpan = document.getElementById(`swatch-label-${type}-${index}`);
     if (labelSpan) labelSpan.innerText = hex.toUpperCase().replace('#', '');
-    
     const swatch = document.getElementById(`swatch-color-${type}-${index}`);
-    if(swatch) {
-        swatch.style.background = hex;
-    }
-    
-    if (mode !== 'shader') {
-        triggerCanvasUpdate();
-    }
+    if(swatch) { swatch.style.background = hex; }
+    if (mode !== 'shader') { triggerCanvasUpdate(); }
 }
 
 window.openCustomColorPicker = function(e, type, index, currentHex) {
@@ -242,6 +144,8 @@ window.openCustomColorPicker = function(e, type, index, currentHex) {
     picker = document.createElement('div');
     picker.id = 'custom-color-picker';
     picker.style.position = 'absolute';
+    picker.style.top = 'calc(100% + 4px)';
+    picker.style.left = '0px'; 
     picker.style.zIndex = '9999';
     picker.style.width = '180px';
     picker.style.background = 'rgba(255, 255, 255, 0.9)';
@@ -253,12 +157,11 @@ window.openCustomColorPicker = function(e, type, index, currentHex) {
     picker.style.display = 'flex';
     picker.style.flexDirection = 'column';
     picker.style.gap = '8px';
-    document.body.appendChild(picker);
+    picker.addEventListener('click', (ev) => ev.stopPropagation());
   }
 
-  const rect = e.currentTarget.getBoundingClientRect();
-  picker.style.top = (rect.bottom + 5) + 'px';
-  picker.style.left = rect.left + 'px';
+  // Appends to the specific swatch row clicked, keeping math contained in the scaled layer
+  e.currentTarget.appendChild(picker);
   picker.style.display = 'flex';
 
   const palette = getBrandPalette();
@@ -348,19 +251,16 @@ function renderColorUI() {
   const swatchesContainer = document.getElementById('ui-color-swatches');
   const bgContainer = document.getElementById('ui-bg-swatch');
 
-  if (swatchesContainer) {
-    swatchesContainer.innerHTML = fgColors.map((c, i) => createSwatchHTML(c, 'fg', i)).join('');
-  }
-
-  if (bgContainer) {
-    bgContainer.innerHTML = createSwatchHTML(bg, 'bg', 0); 
-  }
+  if (swatchesContainer) { swatchesContainer.innerHTML = fgColors.map((c, i) => createSwatchHTML(c, 'fg', i)).join(''); }
+  if (bgContainer) { bgContainer.innerHTML = createSwatchHTML(bg, 'bg', 0); }
+  
+  // Re-eval height after populating
+  setTimeout(window.fitToolbarToScreen, 10);
 }
 
 function closeAllDropdowns() {
   document.querySelectorAll('.select-items').forEach(item => item.classList.add('select-hide'));
   document.querySelectorAll('.select-selected').forEach(btn => btn.classList.remove('active'));
-  
   const picker = document.getElementById('custom-color-picker');
   if (picker) picker.style.display = 'none';
 }
@@ -369,37 +269,23 @@ function applyDropdown(selectId, items, defaultVal, callback) {
   const select = document.getElementById(selectId);
   if(!select) return;
   const btn = select.querySelector('.select-selected');
-  if(!btn) return;
+  let dropdown = select.querySelector('.select-items');
+  if(!btn || !dropdown) return;
   
-  const portalId = selectId + '-portal';
-  let dropdown = document.getElementById(portalId);
-  
-  if (!dropdown) {
-    dropdown = select.querySelector('.select-items');
-    if (dropdown) {
-      dropdown.id = portalId;
-    } else {
-      dropdown = document.createElement('div');
-      dropdown.className = 'select-items select-hide';
-      dropdown.id = portalId;
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const isOpening = dropdown.classList.contains('select-hide');
+    closeAllDropdowns();
+    if (isOpening) {
+      btn.classList.add('active');
+      dropdown.classList.remove('select-hide');
+      // Anchor dynamically inside relative wrapper
+      dropdown.style.position = 'absolute';
+      dropdown.style.top = 'calc(100% + 4px)'; 
+      dropdown.style.left = '0px';
+      dropdown.style.width = '100%';
     }
-    document.body.appendChild(dropdown);
-
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const isOpening = dropdown.classList.contains('select-hide');
-      closeAllDropdowns();
-      if (isOpening) {
-        btn.classList.add('active');
-        dropdown.classList.remove('select-hide');
-        const rect = btn.getBoundingClientRect();
-        dropdown.style.position = 'absolute';
-        dropdown.style.top = (rect.bottom + 2) + 'px'; 
-        dropdown.style.left = rect.left + 'px';
-        dropdown.style.width = rect.width + 'px';
-      }
-    });
-  }
+  });
 
   dropdown.innerHTML = '';
   items.forEach(item => {
@@ -410,7 +296,6 @@ function applyDropdown(selectId, items, defaultVal, callback) {
       btn.innerText = item.label;
       btn.dataset.value = item.value;
       callback(item.value);
-      
       dropdown.classList.add('select-hide');
       btn.classList.remove('active');
       triggerCanvasUpdate();
@@ -539,20 +424,14 @@ function updateToolbar(mode) {
     }
   });
 
-  const formatItems = [
-    {label: 'PNG', value: 'png'},
-    {label: 'JPG', value: 'jpg'}
-  ];
-  
-  if (mode === 'cube' || mode === 'flow') {
-    formatItems.push({label: 'SVG', value: 'svg'});
-  }
-  
-  if (!formatItems.find(i => i.value === exportFmtVal)) {
-    exportFmtVal = 'png';
-  }
+  const formatItems = [ {label: 'PNG', value: 'png'}, {label: 'JPG', value: 'jpg'} ];
+  if (mode === 'cube' || mode === 'flow') { formatItems.push({label: 'SVG', value: 'svg'}); }
+  if (!formatItems.find(i => i.value === exportFmtVal)) { exportFmtVal = 'png'; }
   
   applyDropdown('select-export-fmt', formatItems, exportFmtVal, (v) => { exportFmtVal = v; });
+  
+  // Re-eval scale after sections change height
+  setTimeout(window.fitToolbarToScreen, 10);
 }
 
 function generateTrueVectorSVG(targetW, targetH, cropX, cropY) {
@@ -682,10 +561,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("click", function(e) {
     if (!e.target.matches('.select-selected') && !e.target.closest('#custom-color-picker')) closeAllDropdowns();
   });
-  document.getElementById('ui-container').addEventListener('scroll', closeAllDropdowns);
-  window.addEventListener('resize', closeAllDropdowns);
+  
+  window.addEventListener('resize', () => {
+      closeAllDropdowns();
+      window.fitToolbarToScreen();
+  });
 
   updateToolbar(window.currentMode);
+  setTimeout(window.fitToolbarToScreen, 100);
   
   document.getElementById('shuffle-btn').addEventListener('click', () => {
     const palette = getBrandPalette();
