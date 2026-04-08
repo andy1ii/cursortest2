@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+</head>
+<body>
+  
+  <div id="ui-container">
+    
+    <div class="ui-panel header-panel">
+      <div class="header-title">
+        <img src="resources/CursorLogoRevised.png" alt="Logo" class="brand-logo">
+        <span>Generator</span>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+    </div>
+
+    <div class="ui-panel">
+      <div class="section-label">Style</div>
+      <ul id="mode-selector" class="menu-list">
+        <li class="disabled"><img src="resources/1.svg" class="mode-icon" alt="Linework"> Linework</li>
+        <li data-mode="cube" class="active"><img src="resources/2.svg" class="mode-icon" alt="Raster"> Raster <span class="check-icon">􀆅</span></li>
+        <li data-mode="mesh"><img src="resources/3.svg" class="mode-icon" alt="Kinetic"> Kinetic <span class="check-icon">􀆅</span></li>
+        <li data-mode="shader"><img src="resources/4.svg" class="mode-icon" alt="3D Geometry"> 3D Geometry <span class="check-icon">􀆅</span></li>
+        <li data-mode="flow"><img src="resources/5.svg" class="mode-icon" alt="Pen Plotter"> Pen Plotter <span class="check-icon">􀆅</span></li>
+        <li class="disabled"><img src="resources/default.svg" class="mode-icon" alt="Shaders"> Shaders</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <div class="section-label">Illustration</div>
+      <ul class="menu-list">
+        <li class="disabled"><img src="resources/default.svg" class="mode-icon" alt="Preset Spot"> Preset Spot</li>
+        <li class="disabled"><img src="resources/default.svg" class="mode-icon" alt="Parametric Generator"> Parametric Generator</li>
+      </ul>
+    </div>
+
+    <div class="ui-panel">
+      <div class="section-label">Image</div>
+      <div style="padding: 0 6px;">
+        <button id="upload-btn" class="upload-dropzone">
+          <img src="resources/upload.svg" alt="Upload" style="width: 14px; height: 14px; opacity: 0.86;">
+          <span>Upload</span>
+        </button>
+      </div>
+      <input type="file" id="file-upload" accept="image/*" style="display: none;">
+    </div>
+
+    <div class="ui-panel" id="variables-panel">
+      <div class="section-label" style="display: flex; justify-content: space-between; align-items: center;">
+        Variables
+        <svg id="shuffle-btn" style="cursor:pointer; opacity:0.8; width: 12px; height:12px; margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+      </div>
+
+      <div class="divider"></div>
+      
+      <div class="control-group">
+        <label>Color set</label>
+        <div id="ui-color-swatches"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="control-group">
+        <label>Background Color</label>
+        <div id="ui-bg-swatch"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="control-group" id="control-group-dyn1" style="display: none;">
+        <label id="label-dyn1">Variable 1</label>
+        <div class="custom-select full-width" id="select-dyn1" style="display: none;">
+          <div class="select-selected" data-value=""></div><div class="select-items select-hide"></div>
+        </div>
+        <div class="custom-slider-wrapper" id="slider-container-dyn1" style="display: none;">
+          <div class="custom-slider"><div class="custom-slider-track"><div class="custom-slider-fill"></div><div class="custom-slider-thumb"></div></div></div>
+        </div>
+      </div>
+
+      <div class="control-group" id="control-group-dyn2" style="display: none;">
+        <label id="label-dyn2">Variable 2</label>
+        <div class="custom-select full-width" id="select-dyn2" style="display: none;">
+          <div class="select-selected" data-value=""></div><div class="select-items select-hide"></div>
+        </div>
+        <div class="custom-slider-wrapper" id="slider-container-dyn2" style="display: none;">
+          <div class="custom-slider"><div class="custom-slider-track"><div class="custom-slider-fill"></div><div class="custom-slider-thumb"></div></div></div>
+        </div>
+      </div>
+
+      <div class="control-group" id="control-group-dyn3" style="display: none;">
+        <label id="label-dyn3">Variable 3</label>
+        <div class="custom-select full-width" id="select-dyn3" style="display: none;">
+          <div class="select-selected" data-value=""></div><div class="select-items select-hide"></div>
+        </div>
+        <div class="custom-slider-wrapper" id="slider-container-dyn3" style="display: none;">
+          <div class="custom-slider"><div class="custom-slider-track"><div class="custom-slider-fill"></div><div class="custom-slider-thumb"></div></div></div>
+        </div>
+      </div>
+
+      <div class="control-group" id="control-group-dyn-preset" style="display: none;">
+        <label id="label-dyn-preset">Preset</label>
+        <div class="custom-select full-width" id="select-dyn-preset" style="display: none;">
+          <div class="select-selected" data-value=""></div><div class="select-items select-hide"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-panel">
+      <div class="section-label">Export</div>
+      <div class="input-row">
+        <div class="custom-select" id="select-export-scale">
+          <div class="select-selected" data-value="1x">1x</div><div class="select-items select-hide"></div>
+        </div>
+        <div class="custom-select" id="select-export-fmt">
+          <div class="select-selected" data-value="PNG">PNG</div><div class="select-items select-hide"></div>
+        </div>
+      </div>
+      <div style="padding: 0 6px;">
+        <button class="action-btn" id="export-btn">Export</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="brandPalette.js"></script>
+  <script src="colorHarmony.js"></script> 
+  <script src="mesh.js"></script>
+  <script src="flow.js"></script>
+  <script src="cube.js"></script>
+  <script src="geometry.js"></script>
+  <script src="sketch.js"></script>
+  <script src="ui.js"></script> 
+</body>
+</html>

@@ -1,0 +1,322 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* Keeps the font crisp and prevents the browser from rendering it too bulky */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Triggers the true native SF Pro Text with optical sizing on macOS/iOS */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #D7D2CD; 
+}
+
+/* Full-screen background canvas */
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1;
+}
+
+/* Master Container */
+#ui-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  max-height: 95vh; 
+  pointer-events: none; 
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; 
+  overflow-y: auto;
+}
+
+#ui-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* The Glassmorphism Panel */
+.ui-panel {
+  position: relative;
+  background: rgba(255, 255, 255, 0.80);
+  box-shadow: inset 0px 0px 3.549px rgba(255, 255, 255, 0.10), 
+              0px 0px 3.549px rgba(0, 0, 0, 0.25), 
+              0px 42.588px 118.3px rgba(0, 0, 0, 0.20);
+  border-radius: 6px;
+  backdrop-filter: blur(35.49px);
+  -webkit-backdrop-filter: blur(35.49px);
+  padding: 4px; 
+  pointer-events: auto; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* Specific Header Styling */
+.header-panel {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: black;
+  font-size: 12px;
+  font-weight: 500; /* Medium weight for header to stand out slightly */
+  line-height: 18px;
+}
+
+.brand-logo {
+  width: 20px;
+  height: auto;
+  filter: brightness(0); /* Forces image to solid black */
+}
+
+/* Section Labels */
+.section-label, #ui-container label {
+  opacity: 0.67;
+  color: rgba(0, 0, 0, 0.70);
+  font-size: 11px;
+  font-weight: 400; /* Regular weight */
+  line-height: 14px;
+  letter-spacing: 0.06px;
+  padding: 2px 4px;
+  margin-top: 4px;
+  display: block;
+  width: 100%;
+}
+
+/* Divider Line */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 6px 0;
+}
+
+/* Unordered Lists for Styles & Illustration */
+.menu-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+
+.menu-list li {
+  min-height: 20px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.50);
+  font-size: 12px;
+  font-weight: 400; /* Regular weight */
+  line-height: 16px;
+  position: relative;
+  transition: background 0.15s, color 0.15s;
+}
+
+.menu-list li img.mode-icon {
+  width: 12px;
+  height: 12px;
+  opacity: 0.5;
+}
+
+.menu-list li:hover:not(.disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.menu-list li.active {
+  color: black;
+}
+
+.menu-list li.active img.mode-icon {
+  opacity: 1;
+}
+
+.menu-list li.disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.check-icon {
+  display: none;
+  color: rgba(0, 0, 0, 0.94);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.58px;
+  position: absolute;
+  right: 4px;
+}
+
+.menu-list li.active .check-icon {
+  display: block;
+}
+
+/* Form Controls (Buttons, Dropdowns, Swatch Rows) */
+.action-btn, .select-selected, .color-row {
+  height: 24px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 0.06); 
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+  font-size: 12px;
+  font-weight: 400; /* Regular weight, matches Style list perfectly */
+  line-height: 18px;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  margin-bottom: 6px;
+  transition: background 0.1s;
+}
+
+.action-btn {
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.action-btn:hover, .select-selected:hover, .color-row:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Upload Dropzone */
+.upload-dropzone {
+  width: 100%;
+  min-height: 35px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: rgba(0, 0, 0, 0.94);
+  font-size: 11px;
+  font-weight: 400; /* Regular weight */
+  cursor: pointer;
+  transition: background 0.1s;
+  margin-bottom: 6px;
+}
+
+.upload-dropzone:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Row specifically for Select inputs side by side */
+.input-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 6px;
+  margin-bottom: 12px;
+}
+
+.custom-select {
+  position: relative;
+  flex: 1;
+}
+
+/* Dropdown Base */
+.select-selected {
+  justify-content: flex-start;
+  margin-bottom: 0;
+  padding: 0 8px;
+}
+
+/* Dropdown Arrow using SF Pro character equivalent */
+.select-selected::after {
+  content: '􀆈';
+  position: absolute;
+  right: 8px;
+  color: black;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.17px;
+}
+
+/* Dropdown Options Container */
+.select-items {
+  background: rgba(255, 255, 255, 0.9); 
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  border-radius: 6px;
+  z-index: 9999;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.select-items div {
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 400; /* Regular weight */
+  color: black;
+  cursor: pointer;
+}
+
+.select-items div:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.select-hide {
+  display: none;
+}
+
+/* Color Swatches Elements */
+.color-row {
+  margin: 4px 6px;
+  width: auto;
+}
+
+.swatch {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: inline-block;
+}
+
+.color-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-row .pct {
+  color: rgba(0, 0, 0, 0.50);
+  font-size: 12px;
+  font-weight: 400; /* Regular weight */
+  line-height: 18px;
+}
+
+/* Custom UI Slider styling */
+.custom-slider-wrapper {
+  padding: 8px 6px;
+}
+.custom-slider { width: 100%; height: 20px; display: flex; align-items: center; cursor: pointer; position: relative; }
+.custom-slider-track { width: 100%; height: 4px; background: rgba(0, 0, 0, 0.10); border-radius: 2px; position: relative; pointer-events: none; }
+.custom-slider-fill { height: 100%; background: rgba(0, 0, 0, 0.40); border-radius: 2px; position: absolute; top: 0; left: 0; pointer-events: none; }
+.custom-slider-thumb { width: 14px; height: 14px; background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 50%; position: absolute; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform 0.1s ease; pointer-events: none; }
+.custom-slider:active .custom-slider-thumb { transform: translate(-50%, -50%) scale(1.15); }
